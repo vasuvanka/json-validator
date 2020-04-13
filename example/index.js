@@ -1,29 +1,11 @@
-# json-validator
-Json Validator - validates a json object against defined schema object.
-
-## Install
-
-```
-npm install @vasuvanka/json-validator
-```
-
-## Docs
-
-* API Documentation: https://vasuvanka.github.io/json-validator
-
-## Example
-
-
-
-```js
 const {
-  validate
-} = require('@vasuvanka/json-validator');
+    validate
+} = require('../dist')
+
 
 const bodySchema = {
     'name': {
         type: String,
-        default: "helo"
     },
     'phone':{ type: Number},
     'isLoggedIn':{type: Boolean},
@@ -38,15 +20,16 @@ const bodySchema = {
     list: [{type:String}]
 }
 
+
 const body = {
-    name: 'vasu',
+    name: "vasu vanka",
     phone: 8801810010,
     address:{
         line: {
-            add: ["vasu",1]
+            add: [1]
         },
         street: "streetlk111",
-        city: "city",
+        city: 89483,
         pincode: 500005
     },
     isLoggedIn: false,
@@ -56,4 +39,5 @@ const body = {
 const error = validate(body,bodySchema)
 console.log(error)
 
-```
+
+
