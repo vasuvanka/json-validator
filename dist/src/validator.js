@@ -13,7 +13,7 @@ exports.type = {
     'function': 'function'
 };
 // trace - will trace error path
-const trace = [];
+var trace = [];
 /**
  * validateType - validates value and type
  * @param value - value
@@ -26,7 +26,7 @@ function validateType(value, schema, valueType, schemaType) {
     if (schemaType != exports.type.object || !schema.type) {
         return buildErrorMessage(value, valueType, schemaType);
     }
-    const shType = findType(schema.type);
+    var shType = findType(schema.type);
     if (valueType !== shType) {
         return buildErrorMessage(value, valueType, shType);
     }
@@ -40,7 +40,7 @@ function validateType(value, schema, valueType, schemaType) {
  * @returns string - will return constructed error message
  */
 function buildErrorMessage(value, valueType, schemaType) {
-    return `required type '${schemaType}' for value '${JSON.stringify(value)}' but found '${valueType}' at path ${trace.join('.')}`;
+    return "required type '" + schemaType + "' for value '" + JSON.stringify(value) + "' but found '" + valueType + "' at path " + trace.join('.');
 }
 /**
  * validate - will compare json object and defined schema
@@ -51,7 +51,7 @@ function buildErrorMessage(value, valueType, schemaType) {
 function validate(value, schema) {
     // trace = []
     trace.length = 0;
-    const error = validateData(value, schema);
+    var error = validateData(value, schema);
     return error;
 }
 exports.validate = validate;
@@ -62,9 +62,9 @@ exports.validate = validate;
  * @returns string | null - if any schema fails it will return string otherwise null.
  */
 function validateData(value, schema) {
-    const valueType = findType(value);
-    const schemaType = findType(schema);
-    let error = null;
+    var valueType = findType(value);
+    var schemaType = findType(schema);
+    var error = null;
     switch (valueType) {
         case exports.type.string:
             error = validateType(value, schema, valueType, schemaType);
@@ -83,14 +83,15 @@ function validateData(value, schema) {
                 error = buildErrorMessage(value, valueType, schemaType);
             }
             if (Object.keys(schema).length === 0) {
-                error = `found '${valueType}' for value '${JSON.stringify(value)}' but no schema definition found : ${trace.join('.')}`;
+                error = "found '" + valueType + "' for value '" + JSON.stringify(value) + "' but no schema definition found : " + trace.join('.');
             }
             if (!error) {
-                const keys = Object.keys(value);
-                for (const key of keys) {
+                var keys = Object.keys(value);
+                for (var _i = 0, keys_1 = keys; _i < keys_1.length; _i++) {
+                    var key = keys_1[_i];
                     trace.push(key);
                     if (!schema[key]) {
-                        error = `no schema definition found for value ${JSON.stringify(value[key])} : ${trace.join('.')}`;
+                        error = "no schema definition found for value " + JSON.stringify(value[key]) + " : " + trace.join('.');
                     }
                     if (!error) {
                         error = validateData(value[key], schema[key]);
@@ -107,12 +108,12 @@ function validateData(value, schema) {
                 error = buildErrorMessage(value, valueType, schemaType);
             }
             else if (schema.length == 0) {
-                error = `no schema definition found for value ${JSON.stringify(value)} at path ${trace.join('.')}`;
+                error = "no schema definition found for value " + JSON.stringify(value) + " at path " + trace.join('.');
             }
             if (!error) {
-                for (let index = 0; index < value.length; index++) {
-                    const subValue = value[index];
-                    trace.push(`[${index}]`);
+                for (var index = 0; index < value.length; index++) {
+                    var subValue = value[index];
+                    trace.push("[" + index + "]");
                     error = validateData(subValue, schema[0]);
                     if (error != null) {
                         break;
@@ -122,7 +123,7 @@ function validateData(value, schema) {
             }
             break;
         default:
-            error = `no schema definition found for value ${JSON.stringify(value)} at path ${trace.join('.')}`;
+            error = "no schema definition found for value " + JSON.stringify(value) + " at path " + trace.join('.');
             break;
     }
     return error;
@@ -133,7 +134,7 @@ function validateData(value, schema) {
  * @returns string
  */
 function findType(value) {
-    const valueType = typeof value;
+    var valueType = typeof value;
     if (valueType === exports.type.string) {
         if (!isNaN(Date.parse(value))) {
             return exports.type.date;
