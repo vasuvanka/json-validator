@@ -1,6 +1,6 @@
 {
   "name": "@vasuvanka/json-validator",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "general purpose json schema validator",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
@@ -19,10 +19,11 @@
     "url": "git+https://github.com/vasuvanka/json-validator.git"
   },
   "keywords": [
-    "schema",
-    "object",
-    "body",
-    "validator"
+    "type validator",
+    "object validator",
+    "json validator",
+    "json schema validator",
+    "type checker"
   ],
   "author": "",
   "license": "MIT",
