@@ -107,11 +107,14 @@ function validateData(value: any, schema: any): string | null {
                 error = `no schema definition found for value ${JSON.stringify(value)} at path ${trace.join('.')}`
             }
             if(!error){
-                for (const subValue of value) {
+                for (let index = 0; index < value.length; index++) {
+                    const subValue = value[index];
+                    trace.push(`[${index}]`)
                     error = validateData(subValue, schema[0])
                     if (error != null) {
                         break
                     }
+                    trace.pop()   
                 }
             }
             break

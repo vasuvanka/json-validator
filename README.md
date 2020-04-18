@@ -1,5 +1,5 @@
 # json-validator
-Json Validator - validates a json object against defined schema object.
+Json Validator - validates a json object against defined schema and written with zero dependencies.
 
 ## Install
 
@@ -13,8 +13,6 @@ npm install @vasuvanka/json-validator
 
 ## Example
 
-
-
 ```js
 const {
   validate
@@ -23,7 +21,6 @@ const {
 const bodySchema = {
     'name': {
         type: String,
-        default: "helo"
     },
     'phone':{ type: Number},
     'isLoggedIn':{type: Boolean},
@@ -57,3 +54,7 @@ const error = validate(body,bodySchema)
 console.log(error)
 
 ```
+## LICENCE
+MIT
+
+## Free software,hell ya.

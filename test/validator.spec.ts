@@ -303,7 +303,7 @@ describe('validate', () => {
         }
         const error = validate(body,bodySchema)
         expect(error).not.toBe(null)
-        expect(error).toBe("required type 'number' for value '\"hello world\"' but found 'string' at path address")
+        expect(error).toBe("required type 'number' for value '\"hello world\"' but found 'string' at path address.[0]")
     })
 
     it('should return error no schema definiton',()=>{
