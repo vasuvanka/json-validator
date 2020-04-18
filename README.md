@@ -36,15 +36,15 @@ const bodySchema = {
 }
 
 const body = {
-    name: 'vasu',
-    phone: 8801810010,
+    name: 'Hello',
+    phone: 88010000000,
     address:{
         line: {
-            add: ["vasu",1]
+            add: [1]
         },
         street: "streetlk111",
-        city: "city",
-        pincode: 500005
+        city: "some city",
+        pincode: 453672
     },
     isLoggedIn: false,
     list: ['hello','world']
