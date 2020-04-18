@@ -1,6 +1,6 @@
 {
   "name": "@vasuvanka/json-validator",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "general purpose json schema validator",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
