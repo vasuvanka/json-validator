@@ -22,14 +22,14 @@ const bodySchema = {
 
 
 const body = {
-    name: "vasu vanka",
-    phone: 8801810010,
+    name: "Hello",
+    phone: 880000000,
     address:{
         line: {
             add: [1]
         },
         street: "streetlk111",
-        city: 89483,
+        city: "some city",
         pincode: 500005
     },
     isLoggedIn: false,
