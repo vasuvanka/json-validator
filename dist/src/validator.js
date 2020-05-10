@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+// type - object of types
 exports.type = {
     'number': 'number',
     'object': 'object',
@@ -11,8 +12,16 @@ exports.type = {
     'null': 'null',
     'function': 'function'
 };
+// trace - will trace error path
 var trace = [];
-var options = { allowUnknown: false };
+/**
+ * validateType - validates value and type
+ * @param value - value
+ * @param schema - schema
+ * @param valueType - type of value
+ * @param schemaType - type defined in schema
+ * @returns string | null - if schema and value mismatch then it will return error message else null
+ */
 function validateType(value, schema, valueType, schemaType) {
     if (schemaType != exports.type.object || !schema.type) {
         return buildErrorMessage(value, valueType, schemaType);
@@ -23,16 +32,35 @@ function validateType(value, schema, valueType, schemaType) {
     }
     return null;
 }
+/**
+ * buildErrorMessage - will constructs error message
+ * @param value - any value
+ * @param valueType - type of value
+ * @param schemaType - schema type for value
+ * @returns string - will return constructed error message
+ */
 function buildErrorMessage(value, valueType, schemaType) {
     return "required type '" + schemaType + "' for value '" + JSON.stringify(value) + "' but found '" + valueType + "' at path " + trace.join('.');
 }
-function validate(value, schema, options) {
+/**
+ * validate - will compare json object and defined schema
+ * @param value - json object
+ * @param schema - schema definition
+ * @returns string | null - if any schema fails it will return string otherwise null.
+ */
+function validate(value, schema) {
+    // trace = []
     trace.length = 0;
-    options = Object.assign(options, (options || {}));
     var error = validateData(value, schema);
     return error;
 }
 exports.validate = validate;
+/**
+ * validateData - validate json object aganist schema defined
+ * @param value - json object
+ * @param schema - schema definition
+ * @returns string | null - if any schema fails it will return string otherwise null.
+ */
 function validateData(value, schema) {
     var valueType = findType(value);
     var schemaType = findType(schema);
@@ -62,7 +90,7 @@ function validateData(value, schema) {
                 for (var _i = 0, keys_1 = keys; _i < keys_1.length; _i++) {
                     var key = keys_1[_i];
                     trace.push(key);
-                    if (!schema[key] && !options.allowUnknown) {
+                    if (!schema[key]) {
                         error = "no schema definition found for value " + JSON.stringify(value[key]) + " : " + trace.join('.');
                     }
                     if (!error) {
@@ -100,6 +128,11 @@ function validateData(value, schema) {
     }
     return error;
 }
+/**
+ * findType - will return type of given value
+ * @param value : any
+ * @returns string
+ */
 function findType(value) {
     var valueType = typeof value;
     if (valueType === exports.type.string) {

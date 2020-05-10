@@ -10,15 +10,8 @@ export const type = {
     'null': 'null',
     'function': 'function'
 }
-// IOptions - validator configuration 
-interface IOptions {
-    // allowUnknown - default to false
-    allowUnknown: boolean
-}
 // trace - will trace error path
 const trace: string[] = []
-// IOptions - which will allow to do strict check
-let options: IOptions = { allowUnknown: false }
 /**
  * validateType - validates value and type
  * @param value - value
@@ -27,14 +20,14 @@ let options: IOptions = { allowUnknown: false }
  * @param schemaType - type defined in schema
  * @returns string | null - if schema and value mismatch then it will return error message else null
  */
-function validateType(value: any, schema: any, valueType: string, schemaType: string): string | null {
+function validateType(value: any, schema: any, valueType: string, schemaType: string): string| null {
     if (schemaType != type.object || !schema.type) {
-        return buildErrorMessage(value, valueType, schemaType)
-    }
-    const shType = findType(schema.type)
-    if (valueType !== shType) {
-        return buildErrorMessage(value, valueType, shType)
-    }
+        return buildErrorMessage(value,valueType,schemaType)
+       }
+       const shType = findType(schema.type)
+       if (valueType !== shType) {
+           return buildErrorMessage(value,valueType,shType)
+       }
     return null
 }
 /**
@@ -44,7 +37,7 @@ function validateType(value: any, schema: any, valueType: string, schemaType: st
  * @param schemaType - schema type for value
  * @returns string - will return constructed error message
  */
-function buildErrorMessage(value: any, valueType: string, schemaType: string): string {
+function buildErrorMessage(value: any,valueType: string,schemaType: string): string {
     return `required type '${schemaType}' for value '${JSON.stringify(value)}' but found '${valueType}' at path ${trace.join('.')}`
 }
 
@@ -52,24 +45,12 @@ function buildErrorMessage(value: any, valueType: string, schemaType: string): s
  * validate - will compare json object and defined schema
  * @param value - json object
  * @param schema - schema definition
- * @param IOptions - Validator configuration object
  * @returns string | null - if any schema fails it will return string otherwise null.
- * <pre><code>
- * const { validate } = require('@vasuvanka/json-validator')
- * const json = { name : "hello world" };
- * const jsonSchema = { name: { type : String } };
- * // options is an optional parameter
- * const options = {allowUnkown:false}
- * const error = validate(json,jsonSchema, options)
- * if(error){
- *  console.log(`Got error : ${error}`)
- * }
- * </code></pre>
  */
-export function validate(value: any, schema: any, options?: IOptions): string | null {
+export function validate(value: any, schema: any): string | null {
+    // trace = []
     trace.length = 0
-    options = Object.assign(options,(options || {}))
-    const error = validateData(value, schema)
+    const error = validateData(value,schema)
     return error
 }
 /**
@@ -84,36 +65,29 @@ function validateData(value: any, schema: any): string | null {
     let error = null
     switch (valueType) {
         case type.string:
-            error = validateType(value, schema, valueType, schemaType)
+            error = validateType(value,schema,valueType,schemaType)
             break;
-        case type.number:
-            error = validateType(value, schema, valueType, schemaType)
+        case type.number: 
+            error = validateType(value,schema,valueType,schemaType)
             break;
         case type.boolean:
-            error = validateType(value, schema, valueType, schemaType)
+            error = validateType(value,schema,valueType,schemaType)
             break;
-        case type.date:
-            error = validateType(value, schema, valueType, schemaType)
+        case type.date: 
+            error = validateType(value,schema,valueType,schemaType)
             break;
         case type.object:
             if (schemaType != type.object) {
-                error = buildErrorMessage(value, valueType, schemaType)
+                error = buildErrorMessage(value,valueType,schemaType)
             }
             if (Object.keys(schema).length === 0) {
                 error = `found '${valueType}' for value '${JSON.stringify(value)}' but no schema definition found : ${trace.join('.')}`
             }
-            if (!error) {
+            if(!error){
                 const keys = Object.keys(value)
-                // const schemaKeys = Object.keys(schema)
-                // if (schemaKeys > keys && !iOptions.allowUnknown) {
-                //     const notFoundKeys = findNotExistedKeys(schemaKeys, keys)
-                //     if (notFoundKeys.length > 0) {
-                //         error = `no values found for keys ${notFoundKeys.join(',')} : ${trace.join('.')}`
-                //     }
-                // }
                 for (const key of keys) {
                     trace.push(key)
-                    if (!schema[key] && !options.allowUnknown) {
+                    if (!schema[key]) {
                         error = `no schema definition found for value ${JSON.stringify(value[key])} : ${trace.join('.')}`
                     }
                     if (!error) {
@@ -128,11 +102,11 @@ function validateData(value: any, schema: any): string | null {
             break
         case type.array:
             if (findType(schema) !== type.array) {
-                error = buildErrorMessage(value, valueType, schemaType)
+                error = buildErrorMessage(value,valueType,schemaType)
             } else if (schema.length == 0) {
                 error = `no schema definition found for value ${JSON.stringify(value)} at path ${trace.join('.')}`
             }
-            if (!error) {
+            if(!error){
                 for (let index = 0; index < value.length; index++) {
                     const subValue = value[index];
                     trace.push(`[${index}]`)
@@ -140,7 +114,7 @@ function validateData(value: any, schema: any): string | null {
                     if (error != null) {
                         break
                     }
-                    trace.pop()
+                    trace.pop()   
                 }
             }
             break
@@ -191,15 +165,3 @@ export function findType(value: any): string {
     }
     return valueType
 }
-
-
-// function findNotExistedKeys(schemaKeys: string[], keys: string[]) {
-//     const notFoundList = []
-//     for (const k in schemaKeys) {
-//         const found = keys.find(ik => k == ik)
-//         if (!found) {
-//             notFoundList.push(k)
-//         }
-//     }
-//     return notFoundList
-// }
