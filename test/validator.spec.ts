@@ -86,7 +86,8 @@ describe('validate', () => {
     it('success validation', () => {
         const bodySchema = {
             'name': {
-                type: String
+                type: String,
+                default: "helo"
             },
             'phone': { type: Number },
             'isLoggedIn': { type: Boolean },

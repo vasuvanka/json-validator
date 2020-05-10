@@ -52,9 +52,7 @@ const body = {
 }
 const error = validate(body,bodySchema)
 console.log(error)
-// add strict check option, default to strict
-const error = validate(body,bodySchema, { allowUnkown:false})
-console.log(error)
+
 ```
 ## LICENCE
 MIT
