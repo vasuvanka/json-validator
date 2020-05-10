@@ -12,6 +12,14 @@ export const type = {
 }
 // trace - will trace error path
 const trace: string[] = []
+// IOptions - validator configuration 
+interface IOptions {
+    // allowUnknown - default to false
+    allowUnknown: boolean
+}
+// IOptions - which will allow to do strict check
+let options: IOptions = { allowUnknown: true }
+
 /**
  * validateType - validates value and type
  * @param value - value
@@ -45,10 +53,22 @@ function buildErrorMessage(value: any,valueType: string,schemaType: string): str
  * validate - will compare json object and defined schema
  * @param value - json object
  * @param schema - schema definition
+ * @param IOptions - Validator configuration object
  * @returns string | null - if any schema fails it will return string otherwise null.
- */
+ * <pre><code>
+ * const { validate } = require('@vasuvanka/json-validator')
+ * const json = { name : "hello world" };
+ * const jsonSchema = { name: { type : String } };
+ * // options is an optional parameter
+ * const options = {allowUnkown:false}
+ * const error = validate(json,jsonSchema, options)
+ * if(error){
+ *  console.log(`Got error : ${error}`)
+ * }
+ * </code></pre>
+ * */
 export function validate(value: any, schema: any): string | null {
-    // trace = []
+    options = Object.assign(options,(options || {}))
     trace.length = 0
     const error = validateData(value,schema)
     return error
