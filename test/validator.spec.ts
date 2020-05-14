@@ -232,7 +232,8 @@ describe('validate', () => {
         expect(error).toBe("found 'object' for value '{\"line\":\"test street 150\"}' but no schema definition found : address")
     })
 
-    it('should return error for no schema definition at object',()=>{
+    it('should return error for no schema definition at object with allowunknown false',()=>{
+        const config = { allowUnknown: false}
         const bodySchema = {
             'name': {
                 type: String,
@@ -265,9 +266,47 @@ describe('validate', () => {
             list: ['hello', 'world'],
             createdAt: new Date()
         }
-        const error = validate(body,bodySchema)
+        const error = validate(body,bodySchema,config)
         expect(error).not.toBe(null)
         expect(error).toBe("no schema definition found for value \"streetlk111\" : address.street")
+    })
+
+    it('should return error for no schema definition at object with allowunknown true',()=>{
+        const config = { allowUnknown: true}
+        const bodySchema = {
+            'name': {
+                type: String,
+                default: "helo"
+            },
+            'phone': { type: Number },
+            'isLoggedIn': { type: Boolean },
+            'address': {
+                line: {
+                    add: [{ type: Number }]
+                },
+                city: { type: String },
+                pincode: { type: Number },
+            },
+            list: [{ type: String }],
+            createdAt: { type: Date}
+        }
+        const body = {
+            name: 'vasu',
+            phone: 8801810010,
+            address: {
+                line: {
+                    add: [1]
+                },
+                street: "streetlk111",
+                city: "city",
+                pincode: 500005
+            },
+            isLoggedIn: false,
+            list: ['hello', 'world'],
+            createdAt: new Date()
+        }
+        const error = validate(body,bodySchema,config)
+        expect(error).toBe(null)
     })
 
     it('should return error for array definiton',()=>{

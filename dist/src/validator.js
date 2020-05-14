@@ -14,6 +14,8 @@ exports.type = {
 };
 // trace - will trace error path
 var trace = [];
+// IOptions - which will allow to do strict check
+var validatorConfig = { allowUnknown: true };
 /**
  * validateType - validates value and type
  * @param value - value
@@ -46,10 +48,22 @@ function buildErrorMessage(value, valueType, schemaType) {
  * validate - will compare json object and defined schema
  * @param value - json object
  * @param schema - schema definition
+ * @param IOptions - Validator configuration object
  * @returns string | null - if any schema fails it will return string otherwise null.
- */
-function validate(value, schema) {
-    // trace = []
+ * <pre><code>
+ * const { validate } = require('@vasuvanka/json-validator')
+ * const json = { name : "hello world" };
+ * const jsonSchema = { name: { type : String } };
+ * // options is an optional parameter
+ * const options = {allowUnkown:false}
+ * const error = validate(json,jsonSchema, options)
+ * if(error){
+ *  console.log(`Got error : ${error}`)
+ * }
+ * </code></pre>
+ * */
+function validate(value, schema, options) {
+    validatorConfig = Object.assign(validatorConfig, (options || {}));
     trace.length = 0;
     var error = validateData(value, schema);
     return error;
@@ -91,7 +105,12 @@ function validateData(value, schema) {
                     var key = keys_1[_i];
                     trace.push(key);
                     if (!schema[key]) {
-                        error = "no schema definition found for value " + JSON.stringify(value[key]) + " : " + trace.join('.');
+                        if (validatorConfig.allowUnknown) {
+                            continue;
+                        }
+                        else {
+                            error = "no schema definition found for value " + JSON.stringify(value[key]) + " : " + trace.join('.');
+                        }
                     }
                     if (!error) {
                         error = validateData(value[key], schema[key]);
@@ -107,7 +126,7 @@ function validateData(value, schema) {
             if (findType(schema) !== exports.type.array) {
                 error = buildErrorMessage(value, valueType, schemaType);
             }
-            else if (schema.length == 0) {
+            if (schema.length == 0) {
                 error = "no schema definition found for value " + JSON.stringify(value) + " at path " + trace.join('.');
             }
             if (!error) {
@@ -145,27 +164,25 @@ function findType(value) {
         if (value instanceof Array && Array.isArray(value)) {
             return exports.type.array;
         }
-        if (value === null) {
+        else if (value === null) {
             return exports.type.null;
         }
-        if (value instanceof Date) {
+        else if (value instanceof Date) {
             return exports.type.date;
         }
-        if (value instanceof Number) {
+        else if (value instanceof Number) {
             return exports.type.number;
         }
-        if (value instanceof String) {
+        else if (value instanceof String) {
             return exports.type.string;
         }
-        if (value instanceof Boolean) {
+        else if (value instanceof Boolean) {
             return exports.type.boolean;
         }
         return valueType;
     }
-    if (valueType === exports.type.function) {
-        if (value.name) {
-            return value.name.toLowerCase();
-        }
+    if (valueType === exports.type.function && value.name) {
+        return value.name.toLowerCase();
     }
     return valueType;
 }

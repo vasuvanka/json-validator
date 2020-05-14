@@ -39,5 +39,7 @@ const body = {
 const error = validate(body,bodySchema)
 console.log(error)
 
+const err = validate(body,bodySchema, {allowUnknown: false})
+console.log(err)
 
 
