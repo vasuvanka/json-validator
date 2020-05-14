@@ -10,15 +10,16 @@ export const type = {
     'null': 'null',
     'function': 'function'
 }
+// trace - will trace error path
+const trace: string[] = []
 // IOptions - validator configuration 
 interface IOptions {
     // allowUnknown - default to false
     allowUnknown: boolean
 }
-// trace - will trace error path
-const trace: string[] = []
 // IOptions - which will allow to do strict check
-let options: IOptions = { allowUnknown: false }
+let validatorConfig: IOptions = { allowUnknown: true }
+
 /**
  * validateType - validates value and type
  * @param value - value
@@ -65,10 +66,10 @@ function buildErrorMessage(value: any, valueType: string, schemaType: string): s
  *  console.log(`Got error : ${error}`)
  * }
  * </code></pre>
- */
+ * */
 export function validate(value: any, schema: any, options?: IOptions): string | null {
+    validatorConfig = Object.assign(validatorConfig, (options || {}))
     trace.length = 0
-    options = Object.assign(options,(options || {}))
     const error = validateData(value, schema)
     return error
 }
@@ -104,17 +105,14 @@ function validateData(value: any, schema: any): string | null {
             }
             if (!error) {
                 const keys = Object.keys(value)
-                // const schemaKeys = Object.keys(schema)
-                // if (schemaKeys > keys && !iOptions.allowUnknown) {
-                //     const notFoundKeys = findNotExistedKeys(schemaKeys, keys)
-                //     if (notFoundKeys.length > 0) {
-                //         error = `no values found for keys ${notFoundKeys.join(',')} : ${trace.join('.')}`
-                //     }
-                // }
                 for (const key of keys) {
                     trace.push(key)
-                    if (!schema[key] && !options.allowUnknown) {
-                        error = `no schema definition found for value ${JSON.stringify(value[key])} : ${trace.join('.')}`
+                    if (!schema[key]) {
+                        if (validatorConfig.allowUnknown) {
+                            continue
+                        } else {
+                            error = `no schema definition found for value ${JSON.stringify(value[key])} : ${trace.join('.')}`
+                        }
                     }
                     if (!error) {
                         error = validateData(value[key], schema[key])
@@ -129,7 +127,8 @@ function validateData(value: any, schema: any): string | null {
         case type.array:
             if (findType(schema) !== type.array) {
                 error = buildErrorMessage(value, valueType, schemaType)
-            } else if (schema.length == 0) {
+            }
+            if (schema.length == 0) {
                 error = `no schema definition found for value ${JSON.stringify(value)} at path ${trace.join('.')}`
             }
             if (!error) {
@@ -166,40 +165,21 @@ export function findType(value: any): string {
     if (valueType === type.object) {
         if (value instanceof Array && Array.isArray(value)) {
             return type.array
-        }
-        if (value === null) {
+        } else if (value === null) {
             return type.null
-        }
-        if (value instanceof Date) {
+        } else if (value instanceof Date) {
             return type.date
-        }
-        if (value instanceof Number) {
+        } else if (value instanceof Number) {
             return type.number
-        }
-        if (value instanceof String) {
+        } else if (value instanceof String) {
             return type.string
-        }
-        if (value instanceof Boolean) {
+        } else if (value instanceof Boolean) {
             return type.boolean
         }
         return valueType
     }
-    if (valueType === type.function) {
-        if (value.name) {
-            return value.name.toLowerCase()
-        }
+    if (valueType === type.function && value.name) {
+        return value.name.toLowerCase()
     }
     return valueType
 }
-
-
-// function findNotExistedKeys(schemaKeys: string[], keys: string[]) {
-//     const notFoundList = []
-//     for (const k in schemaKeys) {
-//         const found = keys.find(ik => k == ik)
-//         if (!found) {
-//             notFoundList.push(k)
-//         }
-//     }
-//     return notFoundList
-// }

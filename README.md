@@ -1,5 +1,5 @@
 # json-validator
-Json Validator - validates a json object against defined schema and written with zero dependencies.
+Json Validator - validates a json object against defined schema.
 
 ## Install
 
@@ -52,9 +52,10 @@ const body = {
 }
 const error = validate(body,bodySchema)
 console.log(error)
-// add strict check option, default to strict
-const error = validate(body,bodySchema, { allowUnkown:false})
-console.log(error)
+
+const err = validate(body,bodySchema,{allowUnknown: false})
+console.log(err)
+
 ```
 ## LICENCE
 MIT
