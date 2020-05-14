@@ -1,6 +1,6 @@
 {
   "name": "@vasuvanka/json-validator",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "general purpose json schema validator",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
@@ -11,8 +11,12 @@
   ],
   "scripts": {
     "start": "./node_modules/.bin/tsc",
-    "test": "./node_modules/.bin/jest --coverage",
-    "docs": "./node_modules/.bin/typedoc --out docs --mode modules ./src"
+    "test:jest": "./node_modules/.bin/jest --coverage",
+    "test": "npm run test:clear && npm run test:jest",
+    "test:clear": "./node_modules/.bin/jest --clearCache",
+    "docs": "./node_modules/.bin/typedoc --out docs --mode modules ./src",
+    "add:nojekyll": "> .nojekyll",
+    "generate:build": "npm run docs & npm run start"
   },
   "repository": {
     "type": "git",
