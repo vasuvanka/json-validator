@@ -15,7 +15,7 @@
     "test": "npm run test:clear && npm run test:jest",
     "test:clear": "./node_modules/.bin/jest --clearCache",
     "docs": "./node_modules/.bin/typedoc --out docs --mode modules ./src",
-    "add:nojekyll": "> .nojekyll",
+    "add:nojekyll": "> docs/.nojekyll",
     "generate:build": "npm run docs & npm run start"
   },
   "repository": {
