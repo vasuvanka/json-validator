@@ -30,7 +30,8 @@ const body = {
         },
         street: "streetlk111",
         city: "some city",
-        pincode: 500005
+        pincode: 500005,
+        help:'needed'
     },
     isLoggedIn: false,
     list: ['hello','world']
@@ -42,4 +43,14 @@ console.log(error)
 const err = validate(body,bodySchema, {allowUnknown: false})
 console.log(err)
 
-
+const json = {
+    list: "hello",
+  };
+  const jsonSchema = {
+    list: [
+      {
+        type: Boolean,
+      },
+    ],
+  };
+console.log(validate(json,jsonSchema,{allowUnknown: false}))

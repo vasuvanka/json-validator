@@ -1,75 +1,34 @@
 /**
- * author : vasu vanka
+ * author : Vasu Vanka
  * copyright @ 2019 - till date
  * MIT license
  */
-import Types from './helper';
 
-// trace - will trace error path
-const trace: string[] = [];
 // IOptions - validator configuration
-interface IOptions {
-  // allowUnknown - default to false
+export interface IOptions {
+  // allowUnknown - default to true
   allowUnknown: boolean;
 }
-// IOptions - which will allow to do strict check
-let validatorConfig: IOptions = { allowUnknown: true };
 
-/**
- * validateType - validates value and type
- * @param value - value
- * @param schema - schema
- * @param valueType - type of value
- * @param schemaType - type defined in schema
- * @returns string | null - if schema and value mismatch then it will return error message else null
- */
-function validateType(
-  value: any,
-  schema: any,
-  valueType: string,
-  schemaType: string
-): string | null {
-  if (schemaType != Types.object || !schema.type) {
-    return buildErrorMessage(value, valueType, schemaType);
-  }
-  const shType = findType(schema.type);
-  if (valueType !== shType) {
-    return buildErrorMessage(value, valueType, shType);
-  }
-  return null;
-}
-/**
- * buildErrorMessage - will constructs error message
- * @param value - any value
- * @param valueType - type of value
- * @param schemaType - schema type for value
- * @returns string - will return constructed error message
- */
-function buildErrorMessage(
-  value: any,
-  valueType: string,
-  schemaType: string
-): string {
-  return `required type '${schemaType}' for value '${JSON.stringify(
-    value
-  )}' but found '${valueType}' at path ${trace.join(".")}`;
-}
+// trace - will be used track validation path
+const trace: string[] = [];
+
+// IOptions - which will allow to do strict check
+const validatorConfig: IOptions = { allowUnknown: true };
 
 /**
  * validate - will compare json object and defined schema
  * @param value - json object
  * @param schema - schema definition
  * @param IOptions - Validator configuration object
- * @returns string | null - if any schema fails it will return string otherwise null.
+ * @returns Error | null - if value aganist schema fails then return Error otherwise null.
  * <pre><code>
  * const { validate } = require('@vasuvanka/json-validator')
- * const json = { name : "hello world" };
+ * const jsonValue = { name : "hello world" };
  * const jsonSchema = { name: { type : String } };
- * // options is an optional parameter
- * const options = {allowUnkown:false}
- * const error = validate(json,jsonSchema, options)
+ * const error = validate(json,jsonSchema, {allowUnkown:false})
  * if(error){
- *  console.log(`Got error : ${error}`)
+ *  console.log(`Got error : ${error.message}`)
  * }
  * </code></pre>
  * */
@@ -77,129 +36,122 @@ export function validate(
   value: any,
   schema: any,
   options?: IOptions
-): string | null {
-  validatorConfig = Object.assign(validatorConfig, options || {});
+): Error | null {
+  let err = ngValidate(
+    value,
+    schema,
+    Object.assign(validatorConfig, options || {})
+  );
+  let newErr = null;
+  if (err) {
+    newErr = new Error(
+      `${err} at path ${trace.join(".").replace(".[", "[").replace("].", "]")}`
+    );
+  }
   trace.length = 0;
-  const error = validateData(value, schema);
-  return error;
+  return newErr;
+}
+
+function getNoSchemaErrorMessage(value: any) {
+  return `no schema definition found for value '${JSON.stringify(value)}'`;
 }
 /**
- * validateData - validate json object aganist schema defined
+ * ngValidate - validate json object aganist schema defined
  * @param value - json object
  * @param schema - schema definition
+ * @param options - Ioption config object
  * @returns string | null - if any schema fails it will return string otherwise null.
  */
-function validateData(value: any, schema: any): string | null {
-  const valueType = findType(value);
-  const schemaType = findType(schema);
-  let error = null;
-  switch (valueType) {
-    case Types.string:
-      error = validateType(value, schema, valueType, schemaType);
-      break;
-    case Types.number:
-      error = validateType(value, schema, valueType, schemaType);
-      break;
-    case Types.boolean:
-      error = validateType(value, schema, valueType, schemaType);
-      break;
-    case Types.date:
-      error = validateType(value, schema, valueType, schemaType);
-      break;
-    case Types.object:
-      if (schemaType != Types.object) {
-        error = buildErrorMessage(value, valueType, schemaType);
+function ngValidate(value: any, schema: any, options: IOptions): String | null {
+  let err: String | null = null;
+  if (typeof value === "object") {
+    if (!Array.isArray(value)) {
+      if (typeof schema == "object" && Object.keys(schema).length === 0) {
+        return getNoSchemaErrorMessage(value);
       }
-      if (Object.keys(schema).length === 0) {
-        error = `found '${valueType}' for value '${JSON.stringify(
-          value
-        )}' but no schema definition found : ${trace.join(".")}`;
+      if (typeof schema == "object" && Array.isArray(schema)) {
+        return `required type '${Object.prototype.toString
+          .call(schema)
+          .split(" ")[1]
+          .replace("]", "")}' for value '${JSON.stringify(value)}'`;
       }
-      if (!error) {
-        const keys = Object.keys(value);
-        for (const key of keys) {
-          trace.push(key);
-          if (!schema[key]) {
-            if (validatorConfig.allowUnknown) {
-              continue;
-            } else {
-              error = `no schema definition found for value ${JSON.stringify(
-                value[key]
-              )} : ${trace.join(".")}`;
-            }
-          }
-          if (!error) {
-            error = validateData(value[key], schema[key]);
-            if (error != null) {
-              break;
-            }
+      for (const key in value) {
+        trace.push(key);
+        if (!schema[key]) {
+          if (!options.allowUnknown) {
+            return getNoSchemaErrorMessage(value[key]);
           }
           trace.pop();
+          continue;
         }
+        err = ngValidate(value[key], schema[key], options);
+        if (err) {
+          break;
+        }
+        trace.pop();
       }
-      break;
-    case Types.array:
-      if (findType(schema) !== Types.array) {
-        error = buildErrorMessage(value, valueType, schemaType);
+    } else {
+      if (!Array.isArray(schema)) {
+        if (schema?.type) {
+          return getErrorMessage(schema, value);
+        }
+        return getNoSchemaErrorMessage(value);
       }
       if (schema.length == 0) {
-        error = `no schema definition found for value ${JSON.stringify(
-          value
-        )} at path ${trace.join(".")}`;
+        return getNoSchemaErrorMessage(value);
       }
-      if (!error) {
-        for (let index = 0; index < value.length; index++) {
-          const subValue = value[index];
-          trace.push(`[${index}]`);
-          error = validateData(subValue, schema[0]);
-          if (error != null) {
-            break;
-          }
-          trace.pop();
+      let i = 0;
+      for (const v of value) {
+        trace.push(`[${i++}]`);
+        if (!schema[0] && !options.allowUnknown) {
+          return `required type '${Object.prototype.toString
+            .call(schema)
+            .split(" ")[1]
+            .replace("]", "")}' for value '${JSON.stringify(value)}'`;
         }
+        err = ngValidate(v, schema[0], options);
+        if (err) {
+          break;
+        }
+        trace.pop();
       }
-      break;
-    default:
-      error = `no schema definition found for value ${JSON.stringify(
+    }
+  } else {
+    if (!schema?.type) {
+      if (typeof schema == "object" && Array.isArray(schema)) {
+        return `required type '${Object.prototype.toString
+          .call(schema)
+          .split(" ")[1]
+          .replace("]", "")}' for value '${JSON.stringify(value)}'`;
+      }
+      if (!options.allowUnknown) {
+        return getNoSchemaErrorMessage(value);
+      }
+      return null;
+    }
+
+    if (
+      !Object.prototype.toString
+        .call(value)
+        .includes(schema?.type?.name.toString())
+    ) {
+      return `required type '${schema?.type?.name.toString()}' for value '${JSON.stringify(
         value
-      )} at path ${trace.join(".")}`;
-      break;
+      )}'`;
+    }
   }
-  return error;
+  return err;
 }
-/**
- * findType - will return type of given value
- * @param value : any
- * @returns string
- */
-export function findType(value: any): string {
-  // get object instance type
-  Object.prototype.toString.call(value);
-  const valueType = typeof value;
-  if (valueType === Types.string) {
-    if (!isNaN(Date.parse(value))) {
-      return Types.date;
-    }
-    return valueType;
-  }
-  if (valueType === Types.object) {
-    if (value instanceof Array && Array.isArray(value)) {
-      return Types.array;
-    } else if (value === null) {
-      return Types.null;
-    } else if (value instanceof Date) {
-      return Types.date;
-    } else if (value instanceof Number) {
-      return Types.number;
-    } else if (value instanceof String) {
-      return Types.string;
-    } else if (value instanceof Boolean) {
-      return Types.boolean;
-    }
-    return valueType;
-  }
-  if (valueType === Types.function && value.name) {
-    return value.name.toLowerCase();
-  }
-  return valueType;
+
+function getType(value: any): string {
+  return Object.prototype.toString
+    .call(value?.name)
+    .split(" ")[1]
+    .replace("]", "");
+}
+
+function getErrorMessage(schema: any, value: any) {
+  return `required type '${getType(schema?.type)}' for value '${JSON.stringify(
+    value
+  )}'`;
 }

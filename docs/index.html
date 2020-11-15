@@ -83,15 +83,15 @@
 				</a>
 				<pre><code class="language-js"><span class="hljs-keyword">const</span> {
   validate
-} = <span class="hljs-built_in">require</span>(<span class="hljs-string">'@vasuvanka/json-validator'</span>);
+} = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;@vasuvanka/json-validator&#x27;</span>);
 
 <span class="hljs-keyword">const</span> bodySchema = {
-    <span class="hljs-string">'name'</span>: {
+    <span class="hljs-string">&#x27;name&#x27;</span>: {
         <span class="hljs-attr">type</span>: <span class="hljs-built_in">String</span>,
     },
-    <span class="hljs-string">'phone'</span>:{ <span class="hljs-attr">type</span>: <span class="hljs-built_in">Number</span>},
-    <span class="hljs-string">'isLoggedIn'</span>:{<span class="hljs-attr">type</span>: <span class="hljs-built_in">Boolean</span>},
-    <span class="hljs-string">'address'</span>:{
+    <span class="hljs-string">&#x27;phone&#x27;</span>:{ <span class="hljs-attr">type</span>: <span class="hljs-built_in">Number</span>},
+    <span class="hljs-string">&#x27;isLoggedIn&#x27;</span>:{<span class="hljs-attr">type</span>: <span class="hljs-built_in">Boolean</span>},
+    <span class="hljs-string">&#x27;address&#x27;</span>:{
         <span class="hljs-attr">line</span>: { 
             <span class="hljs-attr">add</span> : [{<span class="hljs-attr">type</span>: <span class="hljs-built_in">Number</span>}]
         },
@@ -103,18 +103,18 @@
 }
 
 <span class="hljs-keyword">const</span> body = {
-    <span class="hljs-attr">name</span>: <span class="hljs-string">'Hello'</span>,
+    <span class="hljs-attr">name</span>: <span class="hljs-string">&#x27;Hello&#x27;</span>,
     <span class="hljs-attr">phone</span>: <span class="hljs-number">88010000000</span>,
     <span class="hljs-attr">address</span>:{
         <span class="hljs-attr">line</span>: {
             <span class="hljs-attr">add</span>: [<span class="hljs-number">1</span>]
         },
-        <span class="hljs-attr">street</span>: <span class="hljs-string">"streetlk111"</span>,
-        <span class="hljs-attr">city</span>: <span class="hljs-string">"some city"</span>,
+        <span class="hljs-attr">street</span>: <span class="hljs-string">&quot;streetlk111&quot;</span>,
+        <span class="hljs-attr">city</span>: <span class="hljs-string">&quot;some city&quot;</span>,
         <span class="hljs-attr">pincode</span>: <span class="hljs-number">453672</span>
     },
     <span class="hljs-attr">isLoggedIn</span>: <span class="hljs-literal">false</span>,
-    <span class="hljs-attr">list</span>: [<span class="hljs-string">'hello'</span>,<span class="hljs-string">'world'</span>]
+    <span class="hljs-attr">list</span>: [<span class="hljs-string">&#x27;hello&#x27;</span>,<span class="hljs-string">&#x27;world&#x27;</span>]
 
 }
 <span class="hljs-keyword">const</span> error = validate(body,bodySchema)
@@ -139,7 +139,10 @@
 						<a href="globals.html"><em>Globals</em></a>
 					</li>
 					<li class=" tsd-kind-module">
-						<a href="modules/_validator_.html">&quot;validator&quot;</a>
+						<a href="modules/_src_index_.html">&quot;src/index&quot;</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/_src_validator_.html">&quot;src/validator&quot;</a>
 					</li>
 				</ul>
 			</nav>
@@ -170,6 +173,5 @@
 </div>
 <div class="overlay"></div>
 <script src="assets/js/main.js"></script>
-<script>if (location.protocol == 'file:') document.write('<script src="assets/js/search.js"><' + '/script>');</script>
 </body>
 </html>
